@@ -1,56 +1,101 @@
+<?php
+// File tempat menyimpan data
+$file = "data.json";
+
+// Baca data dari file JSON
+if (file_exists($file)) {
+    $data = json_decode(file_get_contents($file), true);
+} else {
+    $data = [];
+}
+
+// Simpan data baru
+if (isset($_POST['submit'])) {
+    $nama = htmlspecialchars($_POST['nama']);
+    $email = htmlspecialchars($_POST['email']);
+    $pesan = htmlspecialchars($_POST['pesan']);
+
+    $data[] = [
+        "nama" => $nama,
+        "email" => $email,
+        "pesan" => $pesan
+    ];
+
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
+    header("Location: " . $_SERVER['PHP_SELF']); // Refresh halaman agar data tampil langsung
+    exit;
+}
+
+// Hapus data
+if (isset($_GET['hapus'])) {
+    $index = $_GET['hapus'];
+    unset($data[$index]);
+    $data = array_values($data);
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Data Mahasiswa</title>
+    <title>Buku Tamu Online</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(120deg, #a8e063, #56ab2f);
+            background: linear-gradient(120deg, #004d40, #2e7d32, #a8e063);
             margin: 0;
             padding: 0;
             color: #333;
+            background-attachment: fixed;
         }
 
         .container {
-            max-width: 700px;
-            background: #ffffffcc;
-            margin: 80px auto;
+            max-width: 900px;
+            background: #ffffffee;
+            margin: 60px auto;
             border-radius: 20px;
             padding: 30px 40px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             text-align: center;
-            color: #2e7d32;
-            margin-bottom: 25px;
+            color: #1b5e20;
+            margin-bottom: 20px;
         }
 
-        label {
+        h2 {
+            color: #2e7d32;
+            border-bottom: 3px solid #66bb6a;
+            padding-bottom: 5px;
+        }
+
+        form label {
             font-weight: bold;
             color: #1b5e20;
         }
 
-        input[type="text"], input[type="email"], textarea {
+        form input[type="text"], form input[type="email"], form textarea {
             width: 100%;
-            padding: 10px 12px;
+            padding: 10px;
             margin-top: 5px;
             margin-bottom: 15px;
             border-radius: 8px;
             border: 1px solid #81c784;
-            transition: 0.3s;
             font-size: 15px;
+            transition: 0.3s;
         }
 
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+        form input[type="text"]:focus, form input[type="email"]:focus, form textarea:focus {
             border-color: #2e7d32;
-            box-shadow: 0 0 5px #66bb6a;
+            box-shadow: 0 0 6px #66bb6a;
             outline: none;
         }
 
-        input[type="submit"] {
+        form input[type="submit"] {
             background-color: #2e7d32;
             color: white;
             padding: 12px 20px;
@@ -58,25 +103,55 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            width: 100%;
             transition: background 0.3s;
         }
 
-        input[type="submit"]:hover {
+        form input[type="submit"]:hover {
             background-color: #1b5e20;
         }
 
-        .hasil {
-            margin-top: 30px;
-            background: #e8f5e9;
-            padding: 15px 20px;
-            border-left: 6px solid #2e7d32;
-            border-radius: 10px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        table th, table td {
+            border: 1px solid #c8e6c9;
+            padding: 10px;
+        }
+
+        table th {
+            background-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f1f8e9;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-hapus {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .btn-hapus:hover {
+            background-color: #b71c1c;
         }
 
         footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 40px;
             color: white;
             font-size: 14px;
         }
@@ -84,48 +159,51 @@
 </head>
 <body>
     <div class="container">
-        <h1>Form Input Data Mahasiswa</h1>
+        <h1>Buku Tamu Online</h1>
+
+        <h2>Tambah Tamu</h2>
         <form method="POST" action="">
-            <label for="nama">Nama Lengkap</label>
-            <input type="text" id="nama" name="nama" placeholder="Masukkan nama kamu" required>
+            <label>Nama:</label>
+            <input type="text" name="nama" placeholder="Masukkan nama kamu" required>
 
-            <label for="nim">NIM</label>
-            <input type="text" id="nim" name="nim" placeholder="Masukkan NIM" required>
+            <label>Email:</label>
+            <input type="email" name="email" placeholder="Masukkan email kamu" required>
 
-            <label for="prodi">Program Studi</label>
-            <input type="text" id="prodi" name="prodi" placeholder="Masukkan Program Studi" required>
+            <label>Pesan:</label>
+            <textarea name="pesan" rows="3" placeholder="Tulis pesan kamu..." required></textarea>
 
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="Masukkan email aktif" required>
-
-            <label for="pesan">Kesan dan Pesan</label>
-            <textarea id="pesan" name="pesan" rows="3" placeholder="Tuliskan kesan & pesanmu..." required></textarea>
-
-            <input type="submit" name="submit" value="Simpan Data">
+            <input type="submit" name="submit" value="Kirim">
         </form>
 
-        <?php
-        if (isset($_POST['submit'])) {
-            $nama = htmlspecialchars($_POST['nama']);
-            $nim = htmlspecialchars($_POST['nim']);
-            $prodi = htmlspecialchars($_POST['prodi']);
-            $email = htmlspecialchars($_POST['email']);
-            $pesan = htmlspecialchars($_POST['pesan']);
-
-            echo "<div class='hasil'>";
-            echo "<h3>Data Mahasiswa Tersimpan ✅</h3>";
-            echo "<p><b>Nama:</b> $nama</p>";
-            echo "<p><b>NIM:</b> $nim</p>";
-            echo "<p><b>Program Studi:</b> $prodi</p>";
-            echo "<p><b>Email:</b> $email</p>";
-            echo "<p><b>Kesan & Pesan:</b> $pesan</p>";
-            echo "</div>";
-        }
-        ?>
+        <h2>Daftar Tamu</h2>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Pesan</th>
+                <th>Aksi</th>
+            </tr>
+            <?php if (!empty($data)): ?>
+                <?php foreach ($data as $index => $tamu): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= $tamu['nama'] ?></td>
+                        <td><?= $tamu['email'] ?></td>
+                        <td><?= $tamu['pesan'] ?></td>
+                        <td>
+                            <a href="?hapus=<?= $index ?>" class="btn btn-hapus" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="5" style="text-align:center; color:gray;">Belum ada tamu yang mengisi.</td></tr>
+            <?php endif; ?>
+        </table>
     </div>
 
     <footer>
-        &copy; <?= date("Y") ?> Sistem Input Data Mahasiswa | Warna Tema Hijau 🌿
+        &copy; <?= date("Y") ?> Buku Tamu Online — Tema Hijau Gradasi 🌿
     </footer>
 </body>
 </html>
