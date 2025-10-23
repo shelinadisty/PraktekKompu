@@ -1,209 +1,177 @@
 <?php
-// File tempat menyimpan data
-$file = "data.json";
+session_start();
 
-// Baca data dari file JSON
-if (file_exists($file)) {
-    $data = json_decode(file_get_contents($file), true);
-} else {
-    $data = [];
+// Inisialisasi array data jika belum ada
+if (!isset($_SESSION['bukutamu'])) {
+    $_SESSION['bukutamu'] = [];
 }
 
-// Simpan data baru
+// Tambah data baru
 if (isset($_POST['submit'])) {
-    $nama = htmlspecialchars($_POST['nama']);
-    $email = htmlspecialchars($_POST['email']);
-    $pesan = htmlspecialchars($_POST['pesan']);
-
-    $data[] = [
-        "nama" => $nama,
-        "email" => $email,
-        "pesan" => $pesan
+    $data = [
+        'nama' => $_POST['nama'],
+        'nim' => $_POST['nim'],
+        'email' => $_POST['email'],
+        'pesan' => $_POST['pesan']
     ];
-
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
-    header("Location: " . $_SERVER['PHP_SELF']); // Refresh halaman agar data tampil langsung
+    $_SESSION['bukutamu'][] = $data;
+    header("Location: index.php");
     exit;
 }
 
 // Hapus data
 if (isset($_GET['hapus'])) {
-    $index = $_GET['hapus'];
-    unset($data[$index]);
-    $data = array_values($data);
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
-    header("Location: " . $_SERVER['PHP_SELF']);
+    $id = $_GET['hapus'];
+    unset($_SESSION['bukutamu'][$id]);
+    $_SESSION['bukutamu'] = array_values($_SESSION['bukutamu']); // reset index
+    header("Location: index.php");
     exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Tamu Online</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(120deg, #004d40, #2e7d32, #a8e063);
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-attachment: fixed;
-        }
-
-        .container {
-            max-width: 900px;
-            background: #ffffffee;
-            margin: 60px auto;
-            border-radius: 20px;
-            padding: 30px 40px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            text-align: center;
-            color: #1b5e20;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            color: #2e7d32;
-            border-bottom: 3px solid #66bb6a;
-            padding-bottom: 5px;
-        }
-
-        form label {
-            font-weight: bold;
-            color: #1b5e20;
-        }
-
-        form input[type="text"], form input[type="email"], form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid #81c784;
-            font-size: 15px;
-            transition: 0.3s;
-        }
-
-        form input[type="text"]:focus, form input[type="email"]:focus, form textarea:focus {
-            border-color: #2e7d32;
-            box-shadow: 0 0 6px #66bb6a;
-            outline: none;
-        }
-
-        form input[type="submit"] {
-            background-color: #2e7d32;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        form input[type="submit"]:hover {
-            background-color: #1b5e20;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            text-align: left;
-        }
-
-        table th, table td {
-            border: 1px solid #c8e6c9;
-            padding: 10px;
-        }
-
-        table th {
-            background-color: #a5d6a7;
-            color: #1b5e20;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f1f8e9;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .btn-hapus {
-            background-color: #c62828;
-            color: white;
-        }
-
-        .btn-hapus:hover {
-            background-color: #b71c1c;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: white;
-            font-size: 14px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buku Tamu Online Mahasiswa</title>
+<style>
+    * {
+        font-family: 'Poppins', sans-serif;
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb, #84fab0, #8fd3f4);
+        background-size: 1200% 1200%;
+        animation: gradientShift 12s ease infinite;
+    }
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .container {
+        margin-top: 50px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 25px rgba(255,255,255,0.25);
+        width: 90%;
+        max-width: 800px;
+        backdrop-filter: blur(15px);
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 2.2em;
+        text-shadow: 0 0 15px rgba(255,255,255,0.7);
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+    input, textarea {
+        padding: 12px 15px;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        font-size: 15px;
+    }
+    textarea {
+        resize: none;
+        height: 80px;
+    }
+    button {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border: none;
+        color: #fff;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    button:hover {
+        background: linear-gradient(90deg, #764ba2, #667eea);
+        transform: scale(1.05);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #fff;
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    tr:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    a {
+        color: #ffd166;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    a:hover {
+        color: #fff;
+    }
+    .no-data {
+        text-align: center;
+        padding: 20px;
+        color: rgba(255,255,255,0.8);
+        font-style: italic;
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Buku Tamu Online</h1>
 
-        <h2>Tambah Tamu</h2>
-        <form method="POST" action="">
-            <label>Nama:</label>
-            <input type="text" name="nama" placeholder="Masukkan nama kamu" required>
+<div class="container">
+    <h1>📖 Buku Tamu Online Mahasiswa</h1>
 
-            <label>Email:</label>
-            <input type="email" name="email" placeholder="Masukkan email kamu" required>
+    <form method="POST">
+        <input type="text" name="nama" placeholder="Nama Lengkap" required>
+        <input type="text" name="nim" placeholder="NIM" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <textarea name="pesan" placeholder="Pesan..." required></textarea>
+        <button type="submit" name="submit">Tambah Data</button>
+    </form>
 
-            <label>Pesan:</label>
-            <textarea name="pesan" rows="3" placeholder="Tulis pesan kamu..." required></textarea>
-
-            <input type="submit" name="submit" value="Kirim">
-        </form>
-
-        <h2>Daftar Tamu</h2>
-        <table>
+    <table>
+        <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>NIM</th>
+            <th>Email</th>
+            <th>Pesan</th>
+            <th>Aksi</th>
+        </tr>
+        <?php if (empty($_SESSION['bukutamu'])): ?>
+            <tr><td colspan="6" class="no-data">Belum ada data tamu</td></tr>
+        <?php else: ?>
+            <?php $no=1; foreach ($_SESSION['bukutamu'] as $index => $mhs): ?>
             <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Pesan</th>
-                <th>Aksi</th>
+                <td><?= $no++ ?></td>
+                <td><?= htmlspecialchars($mhs['nama']) ?></td>
+                <td><?= htmlspecialchars($mhs['nim']) ?></td>
+                <td><?= htmlspecialchars($mhs['email']) ?></td>
+                <td><?= htmlspecialchars($mhs['pesan']) ?></td>
+                <td><a href="?hapus=<?= $index ?>" onclick="return confirm('Yakin hapus data ini?')">🗑️</a></td>
             </tr>
-            <?php if (!empty($data)): ?>
-                <?php foreach ($data as $index => $tamu): ?>
-                    <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><?= $tamu['nama'] ?></td>
-                        <td><?= $tamu['email'] ?></td>
-                        <td><?= $tamu['pesan'] ?></td>
-                        <td>
-                            <a href="?hapus=<?= $index ?>" class="btn btn-hapus" onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="5" style="text-align:center; color:gray;">Belum ada tamu yang mengisi.</td></tr>
-            <?php endif; ?>
-        </table>
-    </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </table>
+</div>
 
-    <footer>
-        &copy; <?= date("Y") ?> Buku Tamu Online — Tema Hijau Gradasi 🌿
-    </footer>
 </body>
 </html>
