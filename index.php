@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-// Inisialisasi array data jika belum ada
+// Inisialisasi data buku tamu
 if (!isset($_SESSION['bukutamu'])) {
     $_SESSION['bukutamu'] = [];
 }
 
-// Tambah data baru
+// Tambah data
 if (isset($_POST['submit'])) {
     $data = [
         'nama' => $_POST['nama'],
@@ -23,7 +23,7 @@ if (isset($_POST['submit'])) {
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
     unset($_SESSION['bukutamu'][$id]);
-    $_SESSION['bukutamu'] = array_values($_SESSION['bukutamu']); // reset index
+    $_SESSION['bukutamu'] = array_values($_SESSION['bukutamu']); 
     header("Location: index.php");
     exit;
 }
@@ -43,14 +43,14 @@ if (isset($_GET['hapus'])) {
     body {
         margin: 0;
         padding: 0;
-        color: #fff;
+        color: #e0e0e0;
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb, #84fab0, #8fd3f4);
+        background: linear-gradient(270deg, #0f0c29, #302b63, #24243e, #141e30, #243b55);
         background-size: 1200% 1200%;
-        animation: gradientShift 12s ease infinite;
+        animation: gradientShift 35s ease infinite;
     }
     @keyframes gradientShift {
         0% { background-position: 0% 50%; }
@@ -58,20 +58,27 @@ if (isset($_GET['hapus'])) {
         100% { background-position: 0% 50%; }
     }
     .container {
-        margin-top: 50px;
-        background: rgba(255, 255, 255, 0.15);
+        margin-top: 60px;
+        background: rgba(20, 20, 35, 0.7);
         padding: 30px;
         border-radius: 20px;
-        box-shadow: 0 0 25px rgba(255,255,255,0.25);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
         width: 90%;
         max-width: 800px;
         backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.05);
+        animation: fadeIn 1.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(20px);}
+        to {opacity: 1; transform: translateY(0);}
     }
     h1 {
         text-align: center;
         margin-bottom: 25px;
-        font-size: 2.2em;
-        text-shadow: 0 0 15px rgba(255,255,255,0.7);
+        font-size: 2.3em;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(150,150,255,0.6);
     }
     form {
         display: flex;
@@ -85,13 +92,19 @@ if (isset($_GET['hapus'])) {
         border-radius: 10px;
         outline: none;
         font-size: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        transition: background 0.3s;
+    }
+    input:focus, textarea:focus {
+        background: rgba(255, 255, 255, 0.2);
     }
     textarea {
         resize: none;
         height: 80px;
     }
     button {
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: linear-gradient(90deg, #5f72bd, #9b23ea);
         border: none;
         color: #fff;
         padding: 12px;
@@ -102,24 +115,26 @@ if (isset($_GET['hapus'])) {
         transition: all 0.3s ease;
     }
     button:hover {
-        background: linear-gradient(90deg, #764ba2, #667eea);
+        background: linear-gradient(90deg, #9b23ea, #5f72bd);
         transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(155, 35, 234, 0.4);
     }
     table {
         width: 100%;
         border-collapse: collapse;
-        color: #fff;
+        color: #ddd;
+        margin-top: 10px;
     }
     th, td {
         padding: 10px;
         text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,0.3);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     tr:hover {
-        background-color: rgba(255,255,255,0.1);
+        background-color: rgba(255,255,255,0.05);
     }
     a {
-        color: #ffd166;
+        color: #a38ef7;
         text-decoration: none;
         font-weight: bold;
     }
@@ -129,7 +144,7 @@ if (isset($_GET['hapus'])) {
     .no-data {
         text-align: center;
         padding: 20px;
-        color: rgba(255,255,255,0.8);
+        color: rgba(255,255,255,0.7);
         font-style: italic;
     }
 </style>
